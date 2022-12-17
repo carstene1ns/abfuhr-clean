@@ -1,12 +1,13 @@
 #!/bin/env python3
 
+# by carstene1ns, 12/2022
+
 # imports
 import argparse
 from icalendar import Calendar, Event, vCalAddress, vText
-#from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 import sys
-#import pytz
 
 # helper
 def eprint(*args, **kwargs):
@@ -43,7 +44,7 @@ for item, component in enumerate(cal.walk(name = "vevent"), start=1):
 	# set language
 	s.params['language'] = vText('de')
 
-	component['SUMMARY'] = s
+	component['summary'] = s
 
 	# debug
 	if args.verbose:
@@ -52,8 +53,16 @@ for item, component in enumerate(cal.walk(name = "vevent"), start=1):
 		eprint(component.to_ical().decode("utf-8").replace('\r\n', '\n').strip())
 		eprint('-' * 60 + '\n')
 
+# get current year from calender
+first = cal.walk(name = "vevent")[0]
+dt = first.decoded('dtstart').replace(month = 12, day = 5)
 # add reminder to update
-
+event = Event()
+event.add('summary', 'Neuen Abfuhrkalender importieren')
+event.add('dtstart', dt)
+event.add('dtend', dt.replace(day = 6))
+event.add('dtstamp', datetime.now())
+cal.add_component(event)
 
 # output
 if args.output:
